@@ -6,6 +6,7 @@ use App\Http\Controllers\Api\SmsController;
 use App\Http\Controllers\Api\UserController;
 use App\Http\Middleware\CheckApiToken;
 
+Route::post('/users-create', [UserController::class, 'store']);
 Route::middleware(['auth:sanctum'])->get('/user', function (Request $request) {
     return $request->user();
 });

@@ -3,10 +3,44 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Models\ApiToken;
+use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Validator;
 
 class UserController extends Controller
 {
+    public function store(Request $request) {
+        // Validation
+        $validator = Validator::make($request->all(), [
+            'name'     => 'required|string|max:255',
+            'email'    => 'required|string|email|unique:users',
+            'password' => 'required|min:6',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'status' => false,
+                'errors' => $validator->errors()
+            ], 422);
+        }
+
+        // Create User
+        $user = User::create([
+            'name'     => $request->name,
+            'email'    => $request->email,
+            'password' => Hash::make($request->password),
+        ]);
+        $token = $user->createToken('api_token')->plainTextToken;
+        $tokenData = ApiToken::where('tokenable_id', $user->id)->first();
+        return response()->json([
+            'status' => true,
+            'message' => 'User created successfully',
+            'data' => $user,
+            'token' => $tokenData->token
+        ], 201);
+    }
     public function getUserData(Request $request) {
         $user = $request->user;
         return response()->json([

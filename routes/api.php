@@ -14,5 +14,6 @@ Route::middleware([CheckApiToken::class])->group(function () {
     Route::post('/send-sms-by-dlt', [SmsController::class, 'sendByDlt']);
     Route::get('/get-user-data', [UserController::class, 'getUserData']);
     Route::get('/get-user-ballance', [UserController::class, 'getUserBallance']);
+    Route::patch('/get-user-ballance-add', [UserController::class, 'addUserBallance']);
 });
 

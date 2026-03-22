@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\Validator;
 
 class UserController extends Controller
 {
+    // Create User
     public function store(Request $request) {
         // Validation
         $validator = Validator::make($request->all(), [
@@ -41,6 +42,7 @@ class UserController extends Controller
             'token' => $tokenData->token
         ], 201);
     }
+    // Get User Data
     public function getUserData(Request $request) {
         $user = $request->user;
         return response()->json([
@@ -57,6 +59,32 @@ class UserController extends Controller
             'status' => 'success',
             'message' => 'User ballance retrieved successfully',
             'ballance' => $ballance
+        ]);
+    }
+    // Add User  Ballance
+    public function addUserBallance(Request $request) {
+        $uset = $request->user;
+        if(!$uset->id){
+            return response()->json([
+                'status' => 'error',
+                'message' => 'User not found',
+            ], 404);
+        }
+        $validator = Validator::make($request->all(), [
+            'newBall'     => 'required|numeric',
+        ]);
+        if ($validator->fails()) {
+            return response()->json([
+                'status' => false,
+                'errors' => $validator->errors()
+            ], 422);
+        }
+        $uset->credits += $request->newBall;
+        $uset->save();
+        return response()->json([
+            'status' => 'success',
+            'message' => 'User ballance added successfully',
+            'ballance' => $uset->credits
         ]);
     }
 }
